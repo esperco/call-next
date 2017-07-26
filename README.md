@@ -1,8 +1,13 @@
 call-next
 =========
 [![Build Status](https://travis-ci.org/esperco/call-next.svg?branch=master)](https://travis-ci.org/esperco/call-next)
+[![npm version](https://badge.fury.io/js/call-next.svg)](https://badge.fury.io/js/call-next)
 
 Library to help with asynchronous testing
+
+Installation
+------------
+`npm install call-next --save` or `yarn add call-next`
 
 Usage
 -----
