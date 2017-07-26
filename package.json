@@ -6,10 +6,10 @@
   "typings": "./lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fongandrew/call-next.git"
+    "url": "https://github.com/esperco/call-next.git"
   },
   "author": "Andrew Fong <id@andrewfong.com>",
-  "homepage": "https://github.com/fongandrew/call-next",
+  "homepage": "https://github.com/esperco/call-next",
   "license": "MIT",
   "devDependencies": {
     "@types/blue-tape": "^0.1.31",
