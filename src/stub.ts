@@ -1,12 +1,4 @@
-// Represents a declarative function call
-export interface Cmd<F extends Function> {
-  context?: any;
-  fn: F;
-  args: any[];
-}
-
-// Function that returns a promise
-export type PromiseFn<T> = (...args: any[]) => Promise<T>;
+import { Cmd, PromiseFn, setStub } from "./call";
 
 // Data for a single call to the `call` function
 export interface Call<T> {
@@ -17,20 +9,13 @@ export interface Call<T> {
   reject: (err?: any) => void;
 }
 
-// Global context object for tracking function calls
-const context: {
-  calls: Call<any>[];
-  stub?: boolean; // Stubbing active?
-} = {
-  calls: []
-};
+// Persistent var for tracking context calls
+let calls: Call<any>[] = [];
 
 /*
   Record a command passed to the call function
 */
-export const track = <T>(cmd: Cmd<PromiseFn<T>>): Promise<T>|void => {
-  if (! context.stub) return;
-
+export const track = <T>(cmd: Cmd<PromiseFn<T>>): Promise<T> => {
   let resolve: (t: T) => void;
   let reject: (err: any) => void;
   let promise = new Promise<T>((ok, err) => {
@@ -43,7 +28,7 @@ export const track = <T>(cmd: Cmd<PromiseFn<T>>): Promise<T>|void => {
     cmd = { fn: cmd.fn, args: cmd.args };
   }
 
-  context.calls.push({
+  calls.push({
     cmd,
     resolve: resolve!,
     reject: reject!
@@ -55,17 +40,17 @@ export const track = <T>(cmd: Cmd<PromiseFn<T>>): Promise<T>|void => {
 // Enable stubbing (tracking)
 export const stub = () => {
   reset();
-  context.stub = true;
+  setStub(track);
 };
 
 // Disable stubbing
 export const unstub = () => {
-  context.stub = false;
+  setStub();
 };
 
 // Reset list of calls made so far
 export const reset = () => {
-  context.calls = [];
+  calls = [];
 };
 
 // Jumps one tick forward. Resets calls.
@@ -86,9 +71,9 @@ export function getCalls(n: number): Call<any>;
 export function getCalls(): Call<any>[];
 export function getCalls(n?: number): Call<any>|Call<any>[] {
   if (typeof n === "number") {
-    return context.calls[n];
+    return calls[n];
   }
-  return context.calls;
+  return calls;
 }
 
 

@@ -1,4 +1,12 @@
-import { track, PromiseFn } from "./stub";
+// Represents a declarative function call
+export interface Cmd<F extends Function> {
+  context?: any;
+  fn: F;
+  args: any[];
+}
+
+// Function that returns a promise
+export type PromiseFn<T> = (...args: any[]) => Promise<T>;
 
 /*
   NB: Type with `F & PromiseFn<any>` rather than `F extends PromiseFn<any>`
@@ -11,6 +19,15 @@ export interface CallFn {
     context: C, name: N
   ): C[N];
 }
+
+// Stubbed handler for CallFn
+export type StubFn<T> = (cmd: Cmd<PromiseFn<T>>) => Promise<T>;
+
+// Stubbing hook
+let stub: StubFn<any>|undefined;
+export const setStub = <T>(newStub?: StubFn<T>) => {
+  stub = newStub;
+};
 
 /*
   Call function wraps another function. Default behavior is to simply wrap
@@ -43,6 +60,6 @@ export const call: CallFn = (
     throw new Error("No function provided.");
   }
   return (...args: any[]) => {
-    return track({ context, fn, args }) || fn.bind(context)(...args);
+    return stub ? stub({ context, fn, args }) : fn.bind(context)(...args);
   };
 };
