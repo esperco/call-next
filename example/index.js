@@ -39,7 +39,7 @@ test("fetch last post by category id", t =>
     let categoryId = "some-category-id";
 
     // Invoke function under test. Keep promise around for later.
-    let end = newFetchLastPost("some-category-id");
+    let end = newFetchLastPost(categoryId);
 
     t.equal(getCalls().length, 1, "Only one invocation of call() so far");
 
