@@ -1,6 +1,6 @@
-import * as test from "blue-tape";
+import test = require("blue-tape");
 import * as Sinon from "sinon";
-import { call, withStub } from "./index";
+import { call, withStub, assertDone } from "./index";
 
 // Promise function to introduce async behavior
 const tick = <T>(ret: T) => Promise.resolve(ret);
@@ -24,7 +24,7 @@ const getTestFn = (spy: (typeof tick)) => async () => {
   return x + y[0] + y[1];
 };
 
-test("call() invokes original function by default", async (t) => {
+test("call() invokes original function by default", async t => {
   const spy = Sinon.spy(tick);
   const testFn = getTestFn(spy);
 
@@ -35,7 +35,7 @@ test("call() invokes original function by default", async (t) => {
   t.equals(ret, 6, "Function under test returns original results");
 });
 
-test("call() can invoke function with a context", async (t) => {
+test("call() can invoke function with a context", async t => {
   t.equals(await call(contextObj, "tick")(1), 2,
     "Can use object-string format");
 
@@ -43,7 +43,16 @@ test("call() can invoke function with a context", async (t) => {
     "Can reference function itself with any kind of context");
 });
 
-test("withStub allows step-by-step control of call", (t) =>
+test("assertDone() errors when passed a Promise that has not resolved",
+async t => {
+  try {
+    await assertDone(new Promise(() => {}));
+    t.fail("Promise should reject");
+  }
+  catch (err) {} // Success
+});
+
+test("withStub allows step-by-step control of call", t =>
   withStub(async (getCalls, next) => {
     const spy = Sinon.spy(tick);
     const testFn = getTestFn(spy);
@@ -83,14 +92,14 @@ test("withStub allows step-by-step control of call", (t) =>
     getCalls(1).resolve(15);
     await next();
 
-    t.equal(await endP, 5 + 10 + 15,
+    t.equal(await assertDone(endP), 5 + 10 + 15,
       "System under test uses resolved values, not originals");
 
     // Test that we never invoked original functions, even after resolution.
     Sinon.assert.notCalled(spy);
   }));
 
-test("withStub allows rejection of calls", (t) =>
+test("withStub allows rejection of calls", t =>
   withStub(async (getCalls, next) => {
     const spy = Sinon.spy(tick);
     const testFn = getTestFn(spy);
@@ -101,16 +110,17 @@ test("withStub allows rejection of calls", (t) =>
     // Trigger error
     const splatErr = new Error("Splat!");
     getCalls(0).reject(splatErr);
+    await next();
 
     try {
-      await endP;
+      await assertDone(endP);
       t.fail("Promise shoud reject");
     } catch (err) {
       t.equal(err, splatErr, "Promise should reject with right error");
     }
   }));
 
-test("withStub captures context information in calls", (t) =>
+test("withStub captures context information in calls", t =>
   withStub(async (getCalls, next) => {
     call(contextObj, "tick")(1);
     t.deepEqual(getCalls(0).cmd, {
@@ -128,7 +138,7 @@ test("withStub captures context information in calls", (t) =>
     });
   }));
 
-  test("withStub resets in the event of error", async (t) => {
+  test("withStub resets in the event of error", async t => {
     const whoopsErr = new Error("Whoops");
 
     try {
