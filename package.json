@@ -15,6 +15,8 @@
     "@types/blue-tape": "^0.1.31",
     "@types/chai": "^4.0.1",
     "@types/sinon": "^2.3.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-tape-runner": "^2.0.1",
     "blue-tape": "^1.0.0",
     "chai": "^4.0.2",
     "sinon": "^2.3.7",

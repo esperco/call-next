@@ -20,6 +20,11 @@ build: clean
 lint:
 	tslint --type-check --project tsconfig.json
 
-test:
+test-ts:
 	ts-node --project tsconfig.test.json \
 		node_modules/.bin/tape src/**/*.test.* | tap-spec
+
+test-example: build
+	babel-tape-runner example/index.js | tap-spec
+
+test: test-ts test-example
