@@ -107,3 +107,27 @@ in your own setup and teardown functions.
 reset()
 ```
 Manually reset the value of `getCalls`
+
+Production Builds
+-----------------
+`call-next` is a fairly small library to begin with, but if you want to remove
+the stubbing functionality in a production or non-test build, you can alias
+the `call-next` module to `call-next/lib/call` instead, which exposes the
+`call` function and nothing else.
+
+With Webpack, you would modify your `webpack.config.js` like this:
+
+```js
+module.exports = {
+
+  /*
+    Your normal webpack config here
+  */
+
+  resolve: {
+    alias: process.env.NODE_ENV === "production" ? {
+      "call-next": "./node_modules/call-next/lib/call.js"
+    } : {}
+  }
+}
+```
