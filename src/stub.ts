@@ -54,13 +54,13 @@ export const track = <T>(cmd: Cmd<PromiseFn<T>>): Promise<T>|void => {
 
 // Enable stubbing (tracking)
 export const stub = () => {
+  reset();
   context.stub = true;
 };
 
 // Disable stubbing
 export const unstub = () => {
   context.stub = false;
-  reset();
 };
 
 // Reset list of calls made so far
