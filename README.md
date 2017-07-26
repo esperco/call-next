@@ -1,5 +1,7 @@
 call-next
 =========
+[![Build Status](https://travis-ci.org/esperco/call-next.svg?branch=master)](https://travis-ci.org/esperco/call-next)
+
 Library to help with asynchronous testing
 
 Usage
